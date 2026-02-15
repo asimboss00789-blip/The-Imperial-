@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookmarks</title>
+<style>
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;}
+.header{padding:14px 20px;background:linear-gradient(90deg,#0f0f0f,#1a1a1a);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333;}
+.header a{color:#e0e0e0;text-decoration:none;font-weight:600;}
+.content{padding:20px;}
+.form-group{margin-bottom:12px;}
+button{padding:10px 16px;border:none;background:#5465ff;color:#fff;cursor:pointer;border-radius:6px;}
+button:hover{background:#6e84ff;}
+.list{margin-top:20px;}
+.item{padding:8px 12px;border:1px solid #444;margin-bottom:6px;border-radius:6px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <span>Bookmarks</span>
+  <a href="index.html">Home</a>
+</div>
+<div class="content">
+  <div class="search-section">
+    <input type="text" id="searchInput" placeholder="Search manga / manhwa..." />
+    <button id="searchBtn">Search</button>
+    <a href="categories.html" style="margin-left:10px;color:#fff;">Manage Categories</a>
+  </div>
+  <div id="searchResults" class="list"></div>
+  
+  <hr style="margin:20px 0;border-color:#444;" />
+  <h3>Your bookmarks</h3>
+  <div>
+    <label>Filter by category: </label>
+    <select id="categoryFilter"><option value="">--all--</option></select>
+  </div>
+  <div id="bookmarksList" class="list"></div>
+</div>
+<script>
+// storage helpers
+function loadBookmarks(){
+  return JSON.parse(localStorage.getItem('bookmarks')||'[]');
+}
+function saveBookmarks(arr){
+  localStorage.setItem('bookmarks',JSON.stringify(arr));
+}
+function loadCategories(){
+  return JSON.parse(localStorage.getItem('categories')||'[]');
+}
+function saveCategories(arr){
+  localStorage.setItem('categories',JSON.stringify(arr));
+}
+
+function addBookmark(item){
+  const list = loadBookmarks();
+  list.push(item);
+  saveBookmarks(list);
+  renderBookmarks();
+}
+
+function editBookmarkCategory(index,newCat){
+  const list = loadBookmarks();
+  if(list[index]){
+    list[index].category=newCat;
+    saveBookmarks(list);
+    renderBookmarks();
+  }
+}
+function renderBookmarks(filterCat){
+  const list = loadBookmarks();
+  const container = document.getElementById('bookmarksList');
+  container.innerHTML='';
+  const cats = new Set();
+  list.forEach(b=>cats.add(b.category||''));  
+  const filter = filterCat===undefined?document.getElementById('categoryFilter').value:filterCat;
+  list.forEach((b,i)=>{
+    if(filter && b.category!==filter) return;
+    const div = document.createElement('div');
+    div.className='item';
+    div.innerHTML=`<strong>${b.title}</strong> ${b.category?`<em>(${b.category})</em>`:''}<br><a href="${b.url}" target="_blank">link</a> <button data-index="${i}" class="editBtn" style="margin-left:8px;">✎</button>`;
+    container.appendChild(div);
+  });
+  const sel=document.getElementById('categoryFilter');
+  sel.innerHTML='<option value="">--all--</option>';
+  Array.from(cats).filter(c=>c).forEach(c=>{
+    const opt=document.createElement('option');opt.value=c;opt.textContent=c;sel.appendChild(opt);
+  });
+  // attach edit handlers
+  Array.from(document.getElementsByClassName('editBtn')).forEach(btn=>{
+    btn.onclick = () => {
+      const idx = btn.getAttribute('data-index');
+      const newCat = prompt('New category (leave empty to remove):',loadBookmarks()[idx].category||'');
+      editBookmarkCategory(idx,newCat);
+    };
+  });
+}
+
+// search using Jikan API
+async function searchManga(query){
+  const url = `https://api.jikan.moe/v4/manga?q=${encodeURIComponent(query)}&limit=10`;
+  const res = await fetch(url);
+  return res.json();
+}
+
+const searchBtn = document.getElementById('searchBtn');
+const searchInput = document.getElementById('searchInput');
+const resultsDiv = document.getElementById('searchResults');
+
+searchBtn.onclick = async () => {
+  const q = searchInput.value.trim();
+  if(!q) return;
+  resultsDiv.innerHTML = '<div class="loader"></div>';
+  try{
+    const data = await searchManga(q);
+    resultsDiv.innerHTML = '';
+    (data.data||[]).forEach(m=>{
+      const div = document.createElement('div');
+      div.className='item';
+      div.innerHTML = `<div style="display:flex;align-items:center;"><img src="${m.images.jpg.image_url}" alt="" width="50" style="margin-right:10px;"/><div><strong>${m.title}</strong><br><a href="${m.url}" target="_blank">view</a></div></div>
+      <button data-id="${m.mal_id}" style="margin-top:5px;">Bookmark</button>`;
+      div.querySelector('button').onclick = () => {
+        let cats = loadCategories();
+        let cat = '';
+        if(cats.length){
+          cat = prompt('Enter category (or choose from: '+cats.join(', ')+')','');
+        } else {
+          cat = prompt('Enter category (optional):','');
+        }
+        addBookmark({ title:m.title, url:m.url, category:cat });
+      };
+      resultsDiv.appendChild(div);
+    });
+  }catch(e){
+    resultsDiv.textContent='Search error: '+e.message;
+  }
+};
+
+// filter change
+document.getElementById('categoryFilter').onchange = () => renderBookmarks();
+
+renderBookmarks();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost Star</title>
+<style>
+/* Dark theme styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+h1 {
+  font-size: 3rem;
+  text-shadow: 0 0 10px #ff69b4;
+}
+/* navbar and overlay */
+.navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+}
+.navbar button {
+  padding: 8px 12px;
+  background:#5555ff;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  border-radius:4px;
+}
+.navbar button:hover{background:#7777ff;}
+.overlay {
+  position: fixed;
+  top:0;
+  right:0;
+  width:50%;
+  height:100%;
+  background: rgba(0,0,0,0.9);
+  color:#e0e0e0;
+  display:none;
+  flex-direction:column;
+  padding:20px;
+  box-sizing:border-box;
+}
+.overlay h2{margin-top:0;}
+.overlay .link{
+  margin-top:20px;
+  padding:10px;
+  background:#4444aa;
+  color:#fff;
+  text-align:center;
+  cursor:pointer;
+  border-radius:4px;
+}
+.overlay .close {
+  position:absolute;
+  top:10px;
+  left:10px;
+  cursor:pointer;
+  font-size:1.2rem;
+}
+</style>
+</head>
+<body>
+  <h1>Lost Star</h1>
+<div class="navbar">
+  <button id="aiBtn">AI Assistant</button>
+  <a href="bookmarks.html" style="margin-left:10px;color:#fff;">Bookmarks</a>
+</div>
+<div id="overlay" class="overlay">
+  <span class="close" id="closeOverlay">&times;</span>
+  <h2>Lost Star</h2>
+  <div class="link" id="goToAI">Go to AI Assistant &rarr;</div>
+</div>
+<script>
+// overlay script
+const aiBtn = document.getElementById('aiBtn');
+const overlay = document.getElementById('overlay');
+const closeOverlay = document.getElementById('closeOverlay');
+const goToAI = document.getElementById('goToAI');
+aiBtn.onclick = () => { overlay.style.display = 'flex'; };
+closeOverlay.onclick = () => { overlay.style.display = 'none'; };
+goToAI.onclick = () => { window.location.href = 'ai.html'; };
+</script>
+</body>
+</html>

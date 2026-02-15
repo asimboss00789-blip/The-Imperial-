@@ -4,6 +4,8 @@ This project is a simple multi‑page static site with a dark-themed AI chat int
 
 ## Running locally
 
+The site now includes a persistent header with a menu button that opens a half-screen overlay for navigation; it's mobile-friendly and works on small screens with the title shifted to the left.
+
 1. **Install dependencies** (Node.js is required):
    ```bash
    npm install express node-fetch
@@ -25,7 +27,7 @@ This project is a simple multi‑page static site with a dark-themed AI chat int
 
 ## Deployment
 
-You can deploy the static files anywhere (GitHub Pages, Netlify, etc.). For the AI functionality you need a server component like `server.js` running on a host that supports Node.js and has your API key set. Adjust the fetch URL in `ai.html` accordingly if the API is hosted on a different domain.
+You can deploy the static files anywhere (GitHub Pages, Netlify, etc.). All pages share a consistent header and overlay navigation. For the AI functionality you need a server component like `server.js` running on a host that supports Node.js and has your API key set. Adjust the fetch URL in `ai.html` accordingly if the API is hosted on a different domain.
 
 ---
 

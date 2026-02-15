@@ -11,83 +11,100 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #0d0d0d;
   color: #e0e0e0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
-h1 {
-  font-size: 3rem;
-  text-shadow: 0 0 10px #ff69b4;
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 20px;
+  background: #111;
+  border-bottom:1px solid #333;
 }
-/* navbar and overlay */
-.navbar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  padding: 10px;
+header h1 {
+  font-size:1.5rem;
+  margin:0;
 }
-.navbar button {
-  padding: 8px 12px;
+header button {
+  padding:8px 12px;
   background:#5555ff;
   color:#fff;
   border:none;
   cursor:pointer;
   border-radius:4px;
 }
-.navbar button:hover{background:#7777ff;}
+header button:hover{background:#7777ff;}
+.main-content {
+  padding:40px 20px;
+  text-align:center;
+}
+h1.centered {
+  font-size:3rem;
+  text-shadow:0 0 10px #ff69b4;
+}
+/* overlay with split options */
 .overlay {
   position: fixed;
   top:0;
   right:0;
+  bottom:0;
   width:50%;
-  height:100%;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   color:#e0e0e0;
   display:none;
-  flex-direction:column;
-  padding:20px;
+  flex-direction:row;
   box-sizing:border-box;
 }
-.overlay h2{margin-top:0;}
-.overlay .link{
-  margin-top:20px;
-  padding:10px;
-  background:#4444aa;
-  color:#fff;
-  text-align:center;
+.overlay .panel {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   cursor:pointer;
-  border-radius:4px;
+  font-size:1.2rem;
+  padding:20px;
 }
+.overlay .panel:hover {background:rgba(255,255,255,0.05);}
 .overlay .close {
   position:absolute;
   top:10px;
-  left:10px;
+  right:10px;
   cursor:pointer;
-  font-size:1.2rem;
+  font-size:1.5rem;
+}
+@media(max-width:600px) {
+  .overlay {width:100%;flex-direction:column;}
+  header h1 {font-size:1.2rem;}
 }
 </style>
 </head>
 <body>
+<header>
   <h1>Lost Star</h1>
-<div class="navbar">
-  <button id="aiBtn">AI Assistant</button>
-  <a href="bookmarks.html" style="margin-left:10px;color:#fff;">Bookmarks</a>
+  <button id="menuBtn">☰</button>
+</header>
+<div class="main-content">
+  <h1 class="centered">Welcome to Lost Star</h1>
+  <p>Your home for AI chat and bookmarks.</p>
 </div>
 <div id="overlay" class="overlay">
   <span class="close" id="closeOverlay">&times;</span>
-  <h2>Lost Star</h2>
-  <div class="link" id="goToAI">Go to AI Assistant &rarr;</div>
+  <div class="panel" id="panelAI">AI Assistant</div>
+  <div class="panel" id="panelBookmarks">Bookmarks</div>
 </div>
 <script>
-// overlay script
-const aiBtn = document.getElementById('aiBtn');
+const menuBtn = document.getElementById('menuBtn');
 const overlay = document.getElementById('overlay');
 const closeOverlay = document.getElementById('closeOverlay');
-const goToAI = document.getElementById('goToAI');
-aiBtn.onclick = () => { overlay.style.display = 'flex'; };
+const panelAI = document.getElementById('panelAI');
+const panelBookmarks = document.getElementById('panelBookmarks');
+menuBtn.onclick = () => { overlay.style.display = 'flex'; };
 closeOverlay.onclick = () => { overlay.style.display = 'none'; };
-goToAI.onclick = () => { window.location.href = 'ai.html'; };
+panelAI.onclick = () => { window.location.href = 'ai.html'; };
+panelBookmarks.onclick = () => { window.location.href = 'bookmarks.html'; };
+// clicking anywhere outside panels also closes
+overlay.onclick = (e) => {
+  if (e.target === overlay) overlay.style.display = 'none';
+};
 </script>
 </body>
 </html>

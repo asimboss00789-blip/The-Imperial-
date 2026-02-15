@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Assistant</title>
 <style>
+/* modern chatgpt‑like styling */
+*{box-sizing:border-box;}
 body{
   margin:0;
   font-family:'Segoe UI',sans-serif;
@@ -15,34 +17,49 @@ body{
   height:100vh;
 }
 .header{
-  padding:10px;
-  background:#1a1a1a;
+  padding:14px 20px;
+  background:linear-gradient(90deg,#0f0f0f,#1a1a1a);
   display:flex;
   justify-content:space-between;
   align-items:center;
+  border-bottom:1px solid #333;
 }
-.header a{color:#e0e0e0;text-decoration:none;}
+.header a{color:#e0e0e0;text-decoration:none;font-weight:600;}
 .chat-window{
   flex:1;
   overflow-y:auto;
-  padding:10px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
 }
 .message{
-  margin:5px 0;
-  padding:10px;
-  border-radius:8px;
-  max-width:80%;
+  margin:8px 0;
+  padding:12px 16px;
+  border-radius:16px;
+  max-width:70%;
   word-wrap:break-word;
+  line-height:1.4;
 }
-.user{background:#2a2a2a;align-self:flex-end;}
-.ai{background:#4444aa;align-self:flex-start;}
+.user{background:#2c2c2c;align-self:flex-end;color:#fff;}
+.ai{background:#3a3aff;align-self:flex-start;color:#fff;}
 .input-bar{
   display:flex;
   border-top:1px solid #333;
+  padding:10px;
 }
-.input-bar input{flex:1;padding:10px;border:none;background:#2a2a2a;color:#e0e0e0;}
-.input-bar button{padding:10px;border:none;background:#5555ff;color:#fff;cursor:pointer;}
-.input-bar button:hover{background:#7777ff;}
+.input-bar input{flex:1;padding:12px;border:none;background:#2c2c2c;color:#e0e0e0;border-radius:8px;}
+.input-bar button{margin-left:8px;padding:12px 20px;border:none;background:#5465ff;color:#fff;cursor:pointer;border-radius:8px;font-weight:600;}
+.input-bar button:hover{background:#6e84ff;}
+.loader{
+  width:20px;
+  height:20px;
+  border:3px solid #ccc;
+  border-top-color:#5465ff;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:0 auto;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -59,6 +76,7 @@ body{
 const chatWindow = document.getElementById('chatWindow');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
+let conversation = JSON.parse(localStorage.getItem('conversation')||'[]');
 function addMessage(text, sender){
   const div = document.createElement('div');
   div.className = 'message ' + sender;
@@ -66,18 +84,46 @@ function addMessage(text, sender){
   chatWindow.appendChild(div);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
-function aiReply(input){
-  // simple echo dummy
-  return 'AI says: ' + input;
+function renderConversation(){
+  chatWindow.innerHTML = '';
+  conversation.forEach(msg=>addMessage(msg.text,msg.sender));
 }
-sendBtn.onclick=()=>{
+async function callAI(prompt){
+  // send to backend stub; requires you to run server.js or similar
+  const res = await fetch('/chat', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      prompt,
+      history: conversation // include previous messages for context
+    })
+  });
+  const data = await res.json();
+  return data.reply;
+}
+sendBtn.onclick=async ()=>{
   const txt=userInput.value.trim();
-  if(!txt)return;
-  addMessage(txt,'user');
-  setTimeout(()=>addMessage(aiReply(txt),'ai'),500);
+  if(!txt) return;
+  conversation.push({sender:'user',text:txt});
+  renderConversation();
   userInput.value='';
+  // placeholder loader
+  const loader = document.createElement('div');
+  loader.className='loader';
+  chatWindow.appendChild(loader);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+  try{
+    const reply = await callAI(txt);
+    conversation.push({sender:'ai',text:reply});
+  } catch(e){
+    conversation.push({sender:'ai',text:'[error contacting AI]'});
+  }
+  localStorage.setItem('conversation',JSON.stringify(conversation));
+  renderConversation();
 };
 userInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendBtn.click();});
+// initialize
+renderConversation();
 </script>
 </body>
 </html>

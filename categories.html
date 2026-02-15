@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Categories</title>
+<style>
+body{margin:0;font-family:'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;}
+.header{padding:14px 20px;background:linear-gradient(90deg,#0f0f0f,#1a1a1a);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333;}
+.header a{color:#e0e0e0;text-decoration:none;font-weight:600;}
+.content{padding:20px;}
+.list{margin-top:20px;}
+.item{padding:8px 12px;border:1px solid #444;margin-bottom:6px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;}
+button{padding:6px 10px;border:none;background:#5465ff;color:#fff;cursor:pointer;border-radius:6px;}
+button:hover{background:#6e84ff;}
+input[type="text"]{padding:8px;width:60%;background:#2c2c2c;color:#e0e0e0;border:1px solid #444;border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <span>Category Settings</span>
+  <a href="bookmarks.html">Back</a>
+</div>
+<div class="content">
+  <div>
+    <input type="text" id="newCatInput" placeholder="New category name" />
+    <button id="addCatBtn">Add Category</button>
+  </div>
+  <div class="list" id="catList"></div>
+</div>
+<script>
+function loadCategories(){return JSON.parse(localStorage.getItem('categories')||'[]');}
+function saveCategories(arr){localStorage.setItem('categories',JSON.stringify(arr));}
+function renderCategories(){
+  const container=document.getElementById('catList');
+  container.innerHTML='';
+  loadCategories().forEach((c,i)=>{
+    const div=document.createElement('div');
+    div.className='item';
+    div.innerHTML=`<span>${c}</span><button data-index="${i}">Delete</button>`;
+    container.appendChild(div);
+  });
+  Array.from(container.getElementsByTagName('button')).forEach(btn=>{
+    btn.onclick=()=>{
+      const idx=btn.getAttribute('data-index');
+      const cats=loadCategories();
+      cats.splice(idx,1);
+      saveCategories(cats);
+      renderCategories();
+    };
+  });
+}
+document.getElementById('addCatBtn').onclick=()=>{
+  const val=document.getElementById('newCatInput').value.trim();
+  if(!val) return;
+  const cats=loadCategories();
+  if(!cats.includes(val)){
+    cats.push(val);
+    saveCategories(cats);
+    renderCategories();
+    document.getElementById('newCatInput').value='';
+  }
+};
+renderCategories();
+</script>
+</body>
+</html>

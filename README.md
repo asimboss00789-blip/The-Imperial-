@@ -1,10 +1,12 @@
 # The-Imperial-
 
-This project is a simple multi‑page static site with a dark-themed AI chat interface. The AI page is designed to call a backend service that you need to run locally or host in order for the assistant to behave intelligently.
+This project is a simple multi‑page static site with a dark-themed AI chat interface and a built‑in bookmark manager. The bookmarks page lets you search manga/manhwa via the Jikan API and save links locally; search results now include cover thumbnails that hide automatically if they fail to load.
+
+The AI page is designed to call a backend service that you need to run locally or host in order for the assistant to behave intelligently.
 
 ## Running locally
 
-The site now includes a persistent header with a menu button that opens a half-screen overlay for navigation; it's mobile-friendly and works on small screens with the title shifted to the left.
+The site now includes a persistent header with a **menu button on the top‑left** that opens a half‑screen overlay for navigation; it’s mobile‑friendly and works on small screens with the title shifted to the right. The overlay always uses half the viewport width, even on phones, so you can see part of the page behind it.
 
 1. **Install dependencies** (Node.js is required):
    ```bash
@@ -45,6 +47,10 @@ You can also ask for recommendations directly: phrases like **"tell me a poem"**
 Similarly, Reddit is treated as a general knowledge source – prompts beginning with **"reddit"**, **"search reddit"**, or **"r/…"** still work, and the assistant returns titles and snippets of matching posts (including story text if present). The logic will fall back to Reddit when Wikipedia doesn’t return a result.
 
 The assistant now attempts to enrich answers by combining multiple sources when appropriate. For example, a Wikipedia lookup will automatically append a couple of relevant Reddit post titles to give you community context and the reply will note which sources were queried.  
+
+On the client side, the chat input remains active while the bot thinks so typing doesn't feel stuck, and any reply that simply echoes the question is converted into a polite apology.
+
+If the fallback engine doesn’t know an answer it will now perform a quick Wikipedia or Reddit search before giving up, and the default message is a polite "Sorry, I couldn't find an answer..." instead of simply echoing your input. The client also filters out any stray "Echo:" prefixes for a cleaner experience.
 
 As part of this, recommendation requests ("tell me a horror story", "give me 2 songs", etc.) use multiple data feeds.  
 - If you ask for popular items the bot will pull top Reddit posts or Wikipedia entries.  

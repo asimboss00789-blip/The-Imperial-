@@ -48,14 +48,14 @@ button:hover{background:#6e84ff;}
 }
 @media(max-width:600px){
   header h1{font-size:1.2rem;}
-  .overlay {width:100%;flex-direction:column;}
+  /* overlay remains half width */
 }
 </style>
 </head>
 <body>
 <header>
-  <h1>Bookmarks</h1>
   <button id="menuBtn">☰</button>
+  <h1>Bookmarks</h1>
 </header>
 <div class="content">
   <div class="search-section">
@@ -158,7 +158,11 @@ searchBtn.onclick = async () => {
     (data.data||[]).forEach(m=>{
       const div = document.createElement('div');
       div.className='item';
-      div.innerHTML = `<div style="display:flex;align-items:center;"><img src="${m.images.jpg.image_url}" alt="" width="50" style="margin-right:10px;"/><div><strong>${m.title}</strong><br><a href="${m.url}" target="_blank">view</a></div></div>
+      const imgUrl = m.images && m.images.jpg && m.images.jpg.image_url;
+      div.innerHTML = `<div style="display:flex;align-items:center;">
+        ${imgUrl?`<img src="${imgUrl}" alt="${m.title}" width="80" style="margin-right:10px;" onerror="this.style.display='none'"/>`:''}
+        <div><strong>${m.title}</strong><br><a href="${m.url}" target="_blank">view</a></div>
+      </div>
       <button data-id="${m.mal_id}" style="margin-top:5px;">Bookmark</button>`;
       div.querySelector('button').onclick = () => {
         let cats = loadCategories();

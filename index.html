@@ -72,19 +72,31 @@ h1.centered {
   font-size:1.5rem;
 }
 @media(max-width:600px) {
-  .overlay {width:100%;flex-direction:column;}
   header h1 {font-size:1.2rem;}
+  /* overlay remains 50% width by design */
 }
 </style>
 </head>
 <body>
 <header>
-  <h1>Lost Star</h1>
   <button id="menuBtn">☰</button>
+  <h1>Lost Star</h1>
 </header>
 <div class="main-content">
   <h1 class="centered">Welcome to Lost Star</h1>
   <p>Your home for AI chat and bookmarks.</p>
+  <p>We have a built-in AI assistant for questions, recommendations and more, plus a bookmark system to save whatever you like.</p>
+  <p>About us: Lost Star is a demo project showing a dark‑themed web app with intelligent chat and persistent bookmarks. Enjoy exploring!</p>
+  <p>Explore our built‑in <strong>AI assistant</strong> for intelligent conversations and manage your favorites with the <strong>bookmark system</strong>. Learn more about us below.</p>
+  <section style="margin-top:40px;text-align:left;max-width:800px;">
+    <h2>About This Site</h2>
+    <p>Lost Star is a lightweight static web app that comes with two core features:</p>
+    <ul style="text-align:left;">
+      <li>An <strong>AI assistant</strong> which can answer questions using a variety of public data sources (Wikipedia, Reddit, etc.) even when no API key is configured.</li>
+      <li>A <strong>bookmark manager</strong> tuned for manga/manhwa that lets you search, save, and categorize links directly in your browser.</li>
+    </ul>
+    <p>All data is stored locally in the browser, and the AI will try to help you with common queries, recommendations, or information lookup.</p>
+  </section>
 </div>
 <div id="overlay" class="overlay">
   <span class="close" id="closeOverlay">&times;</span>

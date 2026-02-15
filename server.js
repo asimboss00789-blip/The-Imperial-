@@ -249,8 +249,27 @@ app.post('/chat', async (req, res) => {
         }
       } catch(e){ /* continue to other logic */ }
     }
-    // echo fallback if nothing else
-    return res.json({ reply: `Echo: ${p}` });
+    // generic fallback: try a quick Wikipedia search even if not phrased as a question
+    try {
+      const query = encodeURIComponent(p.replace(/[?]$/,'').trim());
+      const info = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${query}`);
+      const json = await info.json();
+      if (json && json.extract) {
+        return res.json({ reply: json.extract + ' (from wiki)' });
+      }
+    } catch(e){/*ignore*/}
+    // as last resort try a simple reddit title search
+    try {
+      const q = encodeURIComponent(p);
+      const r = await fetch(`https://www.reddit.com/search.json?q=${q}&limit=3`, { headers: { 'User-Agent': 'TheImperialBot/1.0' } });
+      const json = await r.json();
+      if (json && json.data && json.data.children && json.data.children.length) {
+        const lines = json.data.children.map(c=>c.data.title).join('\n');
+        return res.json({ reply: `Reddit results:\n${lines}` });
+      }
+    } catch(e){/*ignore*/}
+    // final polite fallback message
+    return res.json({ reply: "Sorry, I couldn't find an answer for that. Could you try rephrasing or ask something else?" });
   }
 
   try {

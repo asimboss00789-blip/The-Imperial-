@@ -3,161 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beastguard AI</title>
+<title>Lost Star</title>
 <style>
-/* RainChatify-inspired dark layout */
+/* Dark theme styles */
 body {
-  margin:0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #1a1a1a;
-  color: #f0f0f0;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-.chat-container {
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-  max-width:600px;
-  margin:auto;
-  border:1px solid #333;
+h1 {
+  font-size: 3rem;
+  text-shadow: 0 0 10px #ff69b4;
 }
-.chat-window {
-  flex:1;
-  overflow-y:auto;
-  padding:10px;
+/* navbar and overlay */
+.navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
 }
-.message {
-  margin:5px 0;
-  padding:10px;
-  border-radius:10px;
-  max-width:80%;
-  word-wrap:break-word;
-}
-.user { background:#2a2a2a; align-self:flex-end;}
-.beastguard { background:#4444aa; align-self:flex-start;}
-.input-bar {
-  display:flex;
-  border-top:1px solid #333;
-}
-input[type="text"] {
-  flex:1;
-  padding:10px;
-  border:none;
-  background:#2a2a2a;
-  color:#f0f0f0;
-}
-button {
-  padding:10px;
-  border:none;
+.navbar button {
+  padding: 8px 12px;
   background:#5555ff;
   color:#fff;
+  border:none;
   cursor:pointer;
+  border-radius:4px;
 }
-button:hover { background:#7777ff; }
-.file-bar {
-  display:flex;
-  padding:5px;
-  border-bottom:1px solid #333;
+.navbar button:hover{background:#7777ff;}
+.overlay {
+  position: fixed;
+  top:0;
+  right:0;
+  width:50%;
+  height:100%;
+  background: rgba(0,0,0,0.9);
+  color:#e0e0e0;
+  display:none;
+  flex-direction:column;
+  padding:20px;
+  box-sizing:border-box;
 }
-.file-bar button {
-  flex:1;
-  margin:0 2px;
+.overlay h2{margin-top:0;}
+.overlay .link{
+  margin-top:20px;
+  padding:10px;
+  background:#4444aa;
+  color:#fff;
+  text-align:center;
+  cursor:pointer;
+  border-radius:4px;
+}
+.overlay .close {
+  position:absolute;
+  top:10px;
+  left:10px;
+  cursor:pointer;
+  font-size:1.2rem;
 }
 </style>
 </head>
 <body>
-
-<div class="chat-container">
-  <div class="file-bar">
-    <button id="uploadFileBtn">Upload Knowledge File</button>
-    <button id="exportMemoryBtn">Export Beastguard Memory</button>
-  </div>
-  <div id="chatWindow" class="chat-window"></div>
-  <div class="input-bar">
-    <input type="text" id="userInput" placeholder="Type your message...">
-    <button id="sendBtn">Send</button>
-  </div>
+  <h1>Lost Star</h1>
+<div class="navbar">
+  <button id="aiBtn">AI Assistant</button>
 </div>
-
-<input type="file" id="fileInput" style="display:none;">
-
+<div id="overlay" class="overlay">
+  <span class="close" id="closeOverlay">&times;</span>
+  <h2>Lost Star</h2>
+  <div class="link" id="goToAI">Go to AI Assistant &rarr;</div>
+</div>
 <script>
-// Beastguard memory in IndexedDB
-let memory = [];
-if(localStorage.getItem('beastguardMemory')) {
-  memory = JSON.parse(localStorage.getItem('beastguardMemory'));
-}
-
-const chatWindow = document.getElementById('chatWindow');
-const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
-const fileInput = document.getElementById('fileInput');
-
-function addMessage(text, sender) {
-  const div = document.createElement('div');
-  div.className = 'message ' + sender;
-  div.textContent = text;
-  chatWindow.appendChild(div);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-// Simple AI logic: pulls from memory to respond
-function beastguardReply(input) {
-  // Simple matching: look for keywords in memory
-  let reply = "Beastguard has pondered your words, but I need more context.";
-  if(memory.length > 0) {
-    for(let entry of memory) {
-      if(entry.text.toLowerCase().includes(input.toLowerCase().split(' ')[0])) {
-        reply = `From what I learned: "${entry.summary}"`;
-        break;
-      }
-    }
-  }
-  // Reflection: store last input
-  memory.push({text: input, summary: input});
-  localStorage.setItem('beastguardMemory', JSON.stringify(memory));
-  return reply;
-}
-
-sendBtn.onclick = () => {
-  const text = userInput.value.trim();
-  if(!text) return;
-  addMessage(text, 'user');
-  const reply = beastguardReply(text);
-  addMessage(reply, 'beastguard');
-  userInput.value = '';
-}
-
-// File upload and learning
-document.getElementById('uploadFileBtn').onclick = () => fileInput.click();
-fileInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const text = reader.result;
-    // Split into chunks to simulate learning
-    const chunks = text.match(/(.|[\r\n]){1,500}/g);
-    for(let chunk of chunks) {
-      memory.push({text: chunk, summary: chunk.slice(0,100) + '...'});
-    }
-    localStorage.setItem('beastguardMemory', JSON.stringify(memory));
-    addMessage(`Beastguard has absorbed ${file.name}`, 'beastguard');
-  };
-  reader.readAsText(file);
-}
-
-// Export memory
-document.getElementById('exportMemoryBtn').onclick = () => {
-  const blob = new Blob([JSON.stringify(memory, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'beastguard_memory.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  addMessage('Beastguard memory exported!', 'beastguard');
-}
-
+// overlay script
+const aiBtn = document.getElementById('aiBtn');
+const overlay = document.getElementById('overlay');
+const closeOverlay = document.getElementById('closeOverlay');
+const goToAI = document.getElementById('goToAI');
+aiBtn.onclick = () => { overlay.style.display = 'flex'; };
+closeOverlay.onclick = () => { overlay.style.display = 'none'; };
+goToAI.onclick = () => { window.location.href = 'ai.html'; };
 </script>
 </body>
 </html>
